@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>利安真自動化旗艦站 5.0</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h1>利安真AI引擎</h1>
+            <span>電商全自動旗艦版</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="switchTab('tab-hero', this)">🖼️ 大師級首圖</li>
+            <li class="nav-item" onclick="switchTab('tab-inner', this)">📄 全套詳情圖</li>
+            <li class="nav-item" onclick="switchTab('tab-copy', this)">✍️ 爆款文案生成</li>
+            <li class="nav-item" onclick="switchTab('tab-title', this)">💡 點擊率標題</li>
+            <li class="nav-item history-tab" onclick="switchTab('tab-history', this)" style="border-top: 1px solid #333; margin-top: 10px;">🕒 歷史生成紀錄</li>
+        </ul>
+    </div>
+
+    <div class="main-wrapper">
+        
+        <div id="tab-hero" class="tab-content active">
+            <div class="panel left-panel">
+                <h2>✨ 大師級首圖生成器</h2>
+                
+                <div class="section-title">圖片上傳</div>
+                <label>產品主體圖 (必填，建議去背圖)</label>
+                <input type="file" id="subjectInput" accept="image/*" multiple onchange="previewImages('subjectInput', 'subjectPreview')">
+                <div class="preview-container" id="subjectPreview"></div>
+
+                <label>場景參考圖 (選填，可多張)</label>
+                <input type="file" id="productInput" accept="image/*" multiple onchange="previewImages('productInput', 'productPreview')">
+                <div class="preview-container" id="productPreview"></div>
+
+                <div class="section-title">電商品類</div>
+                <select id="category">
+                    <option value="美妝保養">1.美妝保養</option>
+                    <option value="女生衣著">2.女生衣著</option>
+                    <option value="男生衣著">3.男生衣著</option>
+                    <option value="保健">4.保健</option>
+                    <option value="時尚配件">5.時尚配件</option>
+                    <option value="家用電器">6.家用電器</option>
+                    <option value="男鞋">7.男鞋</option>
+                    <option value="手機平板與周邊">8.手機平板與周邊</option>
+                    <option value="旅行相關用品/行李箱">9.旅行相關用品/行李箱</option>
+                    <option value="女生包包/精品">10.女生包包/精品</option>
+                    <option value="女鞋">11.女鞋</option>
+                    <option value="男生包包">12.男生包包</option>
+                    <option value="影音">13.影音</option>
+                    <option value="美食、伴手禮">14.美食、伴手禮</option>
+                    <option value="寵物">15.寵物</option>
+                    <option value="母嬰用品">16.母嬰用品</option>
+                    <option value="嬰幼兒童裝童鞋">17.嬰幼兒童裝童鞋</option>
+                    <option value="電玩遊戲">18.電玩遊戲</option>
+                    <option value="相機&空拍機">19.相機&空拍機</option>
+                    <option value="居家生活" selected>20.居家生活</option>
+                    <option value="戶外與運動用品">21.戶外與運動用品</option>
+                    <option value="文具、美術用品">22.文具、美術用品</option>
+                    <option value="愛好與收藏品">23.愛好與收藏品</option>
+                    <option value="汽車類">24.汽車類</option>
+                    <option value="機車類">25.機車類</option>
+                    <option value="票券、優惠券與服務">26.票券、優惠券與服務</option>
+                    <option value="書籍與雜誌期刊">27.書籍與雜誌期刊</option>
+                    <option value="電腦與周邊配件">28.電腦與周邊配件</option>
+                    <option value="3C與筆電">29.3C與筆電</option>
+                </select>
+
+                <div class="section-title">主標題</div>
+                <div class="grid-2">
+                    <div>
+                        <label>第一行 (必填)</label>
+                        <input type="text" id="title1" placeholder="例：滿電復活">
+                    </div>
+                    <div>
+                        <label>第二行 (選填)</label>
+                        <input type="text" id="title2" placeholder="例：急速快充">
+                    </div>
+                </div>
+
+                <div class="section-title">字體樣式</div>
+                <div class="grid-2">
+                    <select id="fontType">
+                        <option value="泡泡圓潤體(活潑可愛)">泡泡圓潤體(活潑可愛)</option>
+                        <option value="奢華金屬體(高貴華麗)">奢華金屬體(高貴華麗)</option>
+                        <option value="典雅明體(高端精緻)">典雅明體(高端精緻)</option>
+                        <option value="力量幾何學(科技力量)">力量幾何學(科技力量)</option>
+                        <option value="書法楷書體(文化底蘊)">書法楷書體(文化底蘊)</option>
+                        <option value="潮流裝飾體(時尚搶眼)">潮流裝飾體(時尚搶眼)</option>
+                        <option value="手寫溫暖體(溫馨自然)">手寫溫暖體(溫馨自然)</option>
+                    </select>
+                    <select id="fontLayout">
+                        <option value="正體(直立)">正體(直立)</option>
+                        <option value="大小錯落(跳動感)">大小錯落(跳動感)</option>
+                        <option value="斜體(傾斜醒目)">斜體(傾斜醒目)</option>
+                        <option value="直排文字(由上到下)">直排文字(由上到下)</option>
+                        <option value="直排+斜角">直排+斜角</option>
+                    </select>
+                </div>
+
+                <div class="section-title">賣點標籤</div>
+                <div class="grid-3">
+                    <input type="text" id="sp1" placeholder="賣點1 (例:超快充)">
+                    <input type="text" id="sp2" placeholder="賣點2 (例:不發燙)">
+                    <input type="text" id="sp3" placeholder="賣點3 (例:好攜帶)">
+                </div>
+
+                <div class="section-title">關鍵細節特寫 (畫中畫)</div>
+                <div class="hint">若填寫，AI 將繪製圓圈特寫圖</div>
+                <label>生成位置</label>
+                <select id="detailPos" style="margin-bottom: 10px;">
+                    <option value="左下角">左下角</option>
+                    <option value="右下角">右下角</option>
+                </select>
+                <div class="grid-3">
+                    <input type="text" id="dt1" placeholder="圓圈1">
+                    <input type="text" id="dt2" placeholder="圓圈2">
+                    <input type="text" id="dt3" placeholder="圓圈3">
+                </div>
+
+                <div class="section-title">進階設定</div>
+                <label>LOGO 圖片 (選填)</label>
+                <input type="file" id="logoInput" accept="image/*" onchange="previewImages('logoInput', 'logoPreview')">
+                <div class="preview-container" id="logoPreview"></div>
+                
+                <div class="section-title">其他自訂提示詞 (選填)</div>
+                <details class="prompt-suggestions" open>
+                    <summary>💡 提示詞建議 (點選標籤快速加入)</summary>
+                    <div class="suggestion-group">
+                        <span class="group-label">🔍 細節圓框</span>
+                        <div class="tags">
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">現實圖</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">純線條圖</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">卡通圖</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">圖示風格</button>
+                        </div>
+                    </div>
+                    <div class="suggestion-group">
+                        <span class="group-label">✨ 標題裝飾</span>
+                        <div class="tags">
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">閃光星星</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">泡泡水滴</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">花草葉片</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">火焰光效</button>
+                        </div>
+                    </div>
+                    <div class="suggestion-group">
+                        <span class="group-label">💡 氛圍場景</span>
+                        <div class="tags">
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">棚拍質感</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">生活場景</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">科技感</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">自然溫暖</button>
+                        </div>
+                    </div>
+                    <div class="suggestion-group">
+                        <span class="group-label">🏷️ 促銷元素</span>
+                        <div class="tags">
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">折扣標籤</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">限時優惠</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">爆款標記</button>
+                            <button type="button" class="prompt-tag" onclick="this.classList.toggle('active')">免運標示</button>
+                        </div>
+                    </div>
+                </details>
+                
+                <textarea id="customPrompt" placeholder="輸入其他要求..."></textarea>
+
+                <button id="generateBtn" class="btn-primary" onclick="startGeneration()">✨ 立即生成 (4K)</button>
+            </div>
+
+            <div class="panel right-panel">
+                <img id="result-image" src="" alt="生成結果">
+                <button id="downloadBtn" class="download-btn" onclick="downloadImageSafe(currentImageUrl, document.getElementById('title1').value + '.jpg')">⬇️ 下載高畫質首圖</button>
+                <div class="status-text" id="statusText">
+                    <h3 style="color:#ccc; margin:0;">尚未生成內容</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-inner" class="tab-content">
+            <div class="panel left-panel">
+                <h2>📄 內文圖一鍵生成 (整套8張)</h2>
+                <div class="hint">支援批量多圖上傳，系統將自動為您進行前端智慧壓縮！</div>
+                
+                <div class="section-title">區塊 1: 基本資訊</div>
+                <label>商品名稱 (必填，將顯示於圖片中)</label>
+                <input type="text" id="innerProductName" placeholder="例如：智能無刷吹風機">
+                <label>電商品類 (必填)</label>
+                <select id="innerCategory">
+                    <option value="美妝保養">1.美妝保養</option>
+                    <option value="女生衣著">2.女生衣著</option>
+                    <option value="男生衣著">3.男生衣著</option>
+                    <option value="保健">4.保健</option>
+                    <option value="時尚配件">5.時尚配件</option>
+                    <option value="家用電器">6.家用電器</option>
+                    <option value="男鞋">7.男鞋</option>
+                    <option value="手機平板與周邊">8.手機平板與周邊</option>
+                    <option value="旅行相關用品/行李箱">9.旅行相關用品/行李箱</option>
+                    <option value="女生包包/精品">10.女生包包/精品</option>
+                    <option value="女鞋">11.女鞋</option>
+                    <option value="男生包包">12.男生包包</option>
+                    <option value="影音">13.影音</option>
+                    <option value="美食、伴手禮">14.美食、伴手禮</option>
+                    <option value="寵物">15.寵物</option>
+                    <option value="母嬰用品">16.母嬰用品</option>
+                    <option value="嬰幼兒童裝童鞋">17.嬰幼兒童裝童鞋</option>
+                    <option value="電玩遊戲">18.電玩遊戲</option>
+                    <option value="相機&空拍機">19.相機&空拍機</option>
+                    <option value="居家生活" selected>20.居家生活</option>
+                    <option value="戶外與運動用品">21.戶外與運動用品</option>
+                    <option value="文具、美術用品">22.文具、美術用品</option>
+                    <option value="愛好與收藏品">23.愛好與收藏品</option>
+                    <option value="汽車類">24.汽車類</option>
+                    <option value="機車類">25.機車類</option>
+                    <option value="票券、優惠券與服務">26.票券、優惠券與服務</option>
+                    <option value="書籍與雜誌期刊">27.書籍與雜誌期刊</option>
+                    <option value="電腦與周邊配件">28.電腦與周邊配件</option>
+                    <option value="3C與筆電">29.3C與筆電</option>
+                </select>
+
+                <div class="section-title">區塊 2 & 3: 圖片上傳</div>
+                <label>商品主體圖 (可批量，建議1-5張，避免傳輸超時)</label>
+                <input type="file" id="innerSubjectInput" accept="image/*" multiple onchange="previewImages('innerSubjectInput', 'innerSubjectPreview')">
+                <div class="preview-container" id="innerSubjectPreview"></div>
+
+                <label>P1 規格圖母圖參考 (選填，僅P1套版)</label>
+                <input type="file" id="innerP1RefInput" accept="image/*" multiple onchange="previewImages('innerP1RefInput', 'innerP1RefPreview')">
+                <div class="preview-container" id="innerP1RefPreview"></div>
+
+                <div class="section-title">區塊 4: 詳情圖整體風格</div>
+                <select id="innerStyle">
+                    <option value="依商品品類自動選擇最適合的專業電商背景風格">預設 (依品類)</option>
+                    <option value="乾淨留白、極簡無印風設計、高質感">簡約 (乾淨留白)</option>
+                    <option value="霓虹光效、賽博龐克、線條感、現代科技風">科技 (現代光效)</option>
+                    <option value="溫馨居家、陽光灑落、木質調生活情境感">生活 (溫馨居家)</option>
+                    <option value="莫蘭迪色系、低飽和度、精品奢華感">高端 (精品質感)</option>
+                    <option value="鮮明色彩、高對比、動感活力、普普風">活潑 (鮮明色彩)</option>
+                </select>
+
+                <div class="section-title">區塊 5: 頁面型式</div>
+                <div class="tags">
+                    <button type="button" class="prompt-tag page-format-tag active" onclick="selectRadioTag('page-format-tag', this)" data-value="預設混合">預設混合 (推薦)</button>
+                    <button type="button" class="prompt-tag page-format-tag" onclick="selectRadioTag('page-format-tag', this)" data-value="痛點導向">痛點導向</button>
+                    <button type="button" class="prompt-tag page-format-tag" onclick="selectRadioTag('page-format-tag', this)" data-value="全產品細節">全產品細節</button>
+                    <button type="button" class="prompt-tag page-format-tag" onclick="selectRadioTag('page-format-tag', this)" data-value="全使用情境">全使用情境</button>
+                </div>
+
+                <div class="section-title">區塊 6: 規格與賣點</div>
+                <label>上傳原規格圖，AI自動提取規格 (選填)</label>
+                <input type="file" id="innerSpecImgInput" accept="image/*" onchange="previewImages('innerSpecImgInput', 'innerSpecImgPreview')">
+                <div class="preview-container" id="innerSpecImgPreview"></div>
+
+                <label style="margin-top: 10px;">P1 規格圖版型</label>
+                <div class="tags" style="margin-bottom: 10px;">
+                    <button type="button" class="prompt-tag p1-layout-tag active" onclick="selectRadioTag('p1-layout-tag', this)" data-value="三層式(上方大標題+中間產品+下方規格表)">三層式</button>
+                    <button type="button" class="prompt-tag p1-layout-tag" onclick="selectRadioTag('p1-layout-tag', this)" data-value="網格式(產品居中+卡片環境)">網格式</button>
+                    <button type="button" class="prompt-tag p1-layout-tag" onclick="selectRadioTag('p1-layout-tag', this)" data-value="左右並排(左產品右規格)">左右並排</button>
+                    <button type="button" class="prompt-tag p1-layout-tag" onclick="selectRadioTag('p1-layout-tag', this)" data-value="極簡風(大留白+小字規格)">極簡風</button>
+                    <button type="button" class="prompt-tag p1-layout-tag" onclick="selectRadioTag('p1-layout-tag', this)" data-value="對比表(多規格並排對比)">對比表</button>
+                </div>
+                
+                <label>自訂輸入選項 (尺寸、顏色等，將顯示於 P1)</label>
+                <input type="text" id="innerSpecs" placeholder="例：尺寸長30CM X 寬20CM X 高15CM...">
+                
+                <label>產品組合配件 (將顯示於 P1)</label>
+                <input type="text" id="innerAccessories" placeholder="例：充電線X1、收納袋X1、說明書...">
+
+                <label style="margin-top: 10px;">核心賣點 (如未填寫由AI判斷)</label>
+                <div class="grid-2">
+                    <input type="text" id="innerSp1" placeholder="賣點 1 (例：快速充電)">
+                    <input type="text" id="innerSp2" placeholder="賣點 2 (例：安全防護)">
+                    <input type="text" id="innerSp3" placeholder="賣點 3">
+                    <input type="text" id="innerSp4" placeholder="賣點 4">
+                    <input type="text" id="innerSp5" placeholder="賣點 5" style="grid-column: span 2;">
+                </div>
+
+                <div class="section-title">區塊 7: 備註</div>
+                <textarea id="innerCustomPrompt" placeholder="輸入更多自訂提示詞 (將一併用於生圖，例如:背景風光、光線、氛圍等)..."></textarea>
+
+                <button id="generateBtnInner" class="btn-primary" onclick="startGenerationInner()">✨ 一鍵生成全套詳情圖 (8張)</button>
+            </div>
+
+            <div id="inner-results-panel" class="panel inner-panel-results">
+                <div class="section-title" style="width:100%; text-align:center; background:#7b61ff; color:white; border:none; border-radius:8px;">📊 內文圖生成九宮格 (4K)</div>
+                <div class="hint" style="margin-bottom:15px; font-size:1rem;">圖片生成後即可點擊下方按鈕一鍵打包下載。</div>
+                
+                <div class="inner-results-grid">
+                    <div id="inner-slot-0" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P1)</div></div>
+                    <div id="inner-slot-1" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P2)</div></div>
+                    <div id="inner-slot-2" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P3)</div></div>
+                    <div id="inner-slot-3" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P4)</div></div>
+                    <div id="inner-slot-4" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P5)</div></div>
+                    <div id="inner-slot-5" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P6)</div></div>
+                    <div id="inner-slot-6" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P7)</div></div>
+                    <div id="inner-slot-7" class="inner-slot"><div class="inner-loading">等待中...</div><img class="inner-img"><div class="inner-download-overlay">⬇️ 下載 (P8)</div></div>
+                </div>
+                
+                <button id="downloadAllInnerBtn" class="download-btn" style="width:100%; display:none;" onclick="downloadAllInnerImages()">📦 一鍵打包下載為 ZIP (8張)</button>
+            </div>
+            
+            <div id="inner-results-placeholder" class="panel right-panel" style="flex:2; display:flex;">
+                <div class="status-text">
+                    <h3 style="color:#ccc; margin:0;">尚未生成詳情圖</h3>
+                    <span style="font-size:0.9rem; color:#aaa;">填寫左側資訊，系統將自動套用高轉化電商邏輯</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-copy" class="tab-content">
+            <div class="panel left-panel">
+                <h2>✍️ 爆款文案生成引擎</h2>
+                <div class="hint">透過 Gemini 3 Flash 多模態視覺技術，自動看圖寫出高轉化蝦皮文案。</div>
+                
+                <div class="section-title">步驟 1: 上傳參考圖片 (AI 看圖辨識)</div>
+                <label>商品圖片 (建議上傳 1-3 張，讓 AI 了解外觀與情境)</label>
+                <input type="file" id="copyImageInput" accept="image/*" multiple onchange="previewImages('copyImageInput', 'copyImagePreview')">
+                <div class="preview-container" id="copyImagePreview"></div>
+
+                <div class="section-title">步驟 2: 輸入基本資訊</div>
+                <label>商品名稱 (必填)</label>
+                <input type="text" id="copyProductName" placeholder="例如：智能無刷吹風機">
+                
+                <label>你想強調的核心賣點 (選填)</label>
+                <input type="text" id="copySellingPoints" placeholder="例如：極速快乾、靜音馬達、負離子護髮...">
+                
+                <div class="section-title">步驟 3: 補充說明 (選填)</div>
+                <textarea id="copyCustomPrompt" placeholder="有什麼想特別補充給 AI 知道的？(例如：目標客群是年輕女性、想強調促銷特價...)"></textarea>
+
+                <button id="generateBtnCopy" class="btn-primary" onclick="startGenerationCopy()">✨ AI 智慧看圖寫文案</button>
+            </div>
+
+            <div class="panel right-panel" style="align-items: flex-start; justify-content: flex-start;">
+                <div class="section-title" style="width:100%; text-align:center; background:#7b61ff; color:white; border:none; border-radius:8px; padding: 10px; box-sizing: border-box; margin-top: 0;">📜 專屬高轉化文案結果</div>
+                <div id="copyLoading" style="display:none; width: 100%; text-align: center; margin-top: 50px;">
+                    <h3 style="color:#7b61ff;">⏳ AI 正在深度分析圖片並撰寫文案中...</h3>
+                    <p style="color:#888;">預計耗時 10~20 秒，請稍候</p>
+                </div>
+                <textarea id="copyResultText" style="width: 100%; height: 100%; min-height: 500px; margin-top: 15px; display: none; font-size: 1rem; line-height: 1.6; padding: 15px; border: 1px solid #ddd; background: #fff; border-radius: 8px; resize: none;" readonly></textarea>
+                
+                <button id="copyToClipboardBtn" class="download-btn" style="width:100%; background:#10b981; display:none;" onclick="copyTextToClipboard('copyResultText', 'copyToClipboardBtn')">📋 一鍵複製完整文案</button>
+            </div>
+        </div>
+
+        <div id="tab-title" class="tab-content">
+            <div class="panel left-panel">
+                <h2>💡 點擊率標題演算法引擎</h2>
+                <div class="hint" style="color:#ef4444; font-weight:bold;">⚠️ 演算法第一法則：請務必利用 Shopdora 確保你的主關鍵字搜尋量大於 7000！</div>
+                
+                <div class="section-title">步驟 1: 輸入驗證過的核心詞</div>
+                <label>主關鍵字 (搜尋量 > 7000 必填)</label>
+                <input type="text" id="titleMainKeyword" placeholder="例如：無刷吹風機">
+                
+                <div class="section-title">步驟 2: 填充相關屬性 (供 AI 擴展)</div>
+                <label>產品類目詞 (例：居家生活、家電)</label>
+                <input type="text" id="titleCategory">
+                <label>吸引點擊的行銷詞 (例：免運、保固一年、隔日配)</label>
+                <input type="text" id="titleMarketing">
+                <label>產品規格詞 (例：11萬轉、靜音、負離子)</label>
+                <input type="text" id="titleSpecs">
+
+                <button id="generateBtnTitle" class="btn-primary" onclick="startGenerationTitle()" style="background:#f59e0b;">🚀 啟動標題演算法</button>
+            </div>
+
+            <div class="panel right-panel" style="align-items: flex-start; justify-content: flex-start;">
+                <div class="section-title" style="width:100%; text-align:center; background:#f59e0b; color:white; border-radius:8px; padding: 10px;">📊 演算法相容標題庫</div>
+                <div id="titleLoading" style="display:none; width: 100%; text-align: center; margin-top: 50px;">
+                    <h3 style="color:#f59e0b;">⏳ 正在運算高點擊率公式...</h3>
+                </div>
+                <textarea id="titleResultText" style="width: 100%; height: 100%; min-height: 400px; margin-top: 15px; display: none; padding: 15px; border: 1px solid #ddd; border-radius: 8px; resize: none; font-size: 1rem; line-height: 1.6; background: #fff;" readonly></textarea>
+                <button id="titleToClipboardBtn" class="download-btn" style="width:100%; background:#10b981; display:none;" onclick="copyTextToClipboard('titleResultText', 'titleToClipboardBtn')">📋 一鍵複製標題庫</button>
+            </div>
+        </div>
+
+        <div id="tab-history" class="tab-content">
+            <div class="panel" style="width: 100%;">
+                <button class="clear-btn" onclick="clearHistory()">🗑️ 清空紀錄</button>
+                <h2 style="border:none; padding:0; margin-bottom: 5px;">🕒 我的生成戰績 (LocalStorage)</h2>
+                <div id="history-grid" class="history-grid"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
