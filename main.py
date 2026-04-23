@@ -23,8 +23,8 @@ app.add_middleware(
 API_KEY = "dk-2cf0beba0b69c12e1b242821d6567d40" # 繪圖專用 
 COPY_API_KEY = "dk-ca97785202cc7c803b16b8b879a3e4d3" # 文案與標題專用
 
-# 🌟 已更新為 Wan 2.7 專用生成端點
-GENERATE_URL = "https://api.defapi.org/api/wan-image/gen"
+# 🌟 已更新為 GPT-Image-2 專用生成端點
+GENERATE_URL = "https://api.defapi.org/api/gpt-image/gen"
 CHAT_URL = "https://api.defapi.org/v1/chat/completions"
 
 # ==========================================
@@ -69,7 +69,7 @@ class TitleGenerateRequest(BaseModel):
     category_words: str
 
 # ==========================================
-# 🧠 大腦 1：首圖專屬通道 (已升級 Wan 2.7)
+# 🧠 大腦 1：首圖專屬通道 (已升級 GPT-Image-2)
 # ==========================================
 @app.post("/api/generate/hero")
 async def generate_hero(req: HeroGenerateRequest):
@@ -159,9 +159,9 @@ async def generate_hero(req: HeroGenerateRequest):
 {f'自訂要求：{req.custom_prompt}' if req.custom_prompt else ''}
 """
 
-    # 🌟 已更新為 Wan 2.7 專用模型名稱
+    # 🌟 已更新為 GPT-Image-2 專用模型名稱
     payload = {
-        "model": "wan-2.7-image",
+        "model": "openai/gpt-image-2",
         "prompt": system_prompt,
         "images": all_images,
         "aspect_ratio": "1:1",
@@ -187,7 +187,7 @@ async def generate_hero(req: HeroGenerateRequest):
 
 
 # ==========================================
-# 🧠 大腦 2：內文圖專屬通道 (已升級 Wan 2.7)
+# 🧠 大腦 2：內文圖專屬通道 (已升級 GPT-Image-2)
 # ==========================================
 @app.post("/api/generate/inner")
 async def generate_inner(req: InnerGenerateRequest):
@@ -225,9 +225,9 @@ async def generate_inner(req: InnerGenerateRequest):
 {req.custom_prompt}
 """
 
-    # 🌟 已更新為 Wan 2.7 專用模型名稱
+    # 🌟 已更新為 GPT-Image-2 專用模型名稱
     payload = {
-        "model": "wan-2.7-image",
+        "model": "openai/gpt-image-2",
         "prompt": system_prompt,
         "images": all_images,
         "aspect_ratio": "1:1",
