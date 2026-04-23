@@ -1,3 +1,84 @@
+// ==========================================
+// 💡 Firebase 核心設定 (SaaS 雲端身分與資料庫)
+// ==========================================
+// 若您有自己的 Firebase 專案，請替換以下內容。目前已為您配置公用測試端點供立即運作。
+const firebaseConfig = {
+  apiKey: "AIzaSyBcrFxjcPLufuy1h4mB4eiMEJJr7SOfOYU",
+  authDomain: "ai-image-9f4f0.firebaseapp.com",
+  projectId: "ai-image-9f4f0",
+  storageBucket: "ai-image-9f4f0.firebasestorage.app",
+  messagingSenderId: "761194267292",
+  appId: "1:761194267292:web:4a23f404b11b02dc6da359",
+};
+
+// 初始化 Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentUser = null;
+
+// ==========================================
+// 👤 會員系統核心邏輯 (Google 登入與介面解鎖)
+// ==========================================
+auth.onAuthStateChanged(async (user) => {
+    const mainWrapper = document.getElementById('main-wrapper');
+    const loginBtn = document.getElementById('loginBtn');
+    const userProfile = document.getElementById('userProfile');
+
+    if (user) {
+        currentUser = user;
+        // 登入成功：隱藏登入按鈕，顯示頭像與姓名
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(userProfile) {
+            userProfile.style.display = 'flex';
+            document.getElementById('userPhoto').src = user.photoURL;
+            document.getElementById('userName').innerText = user.displayName;
+            document.getElementById('userEmail').innerText = user.email;
+        }
+        
+        // 🌟 解鎖系統介面
+        if(mainWrapper) {
+            mainWrapper.style.opacity = '1';
+            mainWrapper.style.pointerEvents = 'auto';
+        }
+
+        // 自動載入該使用者的專屬雲端紀錄
+        if(document.getElementById('tab-history').style.display === 'block') {
+            renderHistory();
+        }
+
+    } else {
+        currentUser = null;
+        // 未登入：顯示登入按鈕，隱藏頭像
+        if(loginBtn) loginBtn.style.display = 'flex';
+        if(userProfile) userProfile.style.display = 'none';
+        
+        // 🔒 鎖定系統介面，強制要求登入
+        if(mainWrapper) {
+            mainWrapper.style.opacity = '0.3';
+            mainWrapper.style.pointerEvents = 'none';
+        }
+    }
+});
+
+async function handleGoogleLogin() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try { 
+        await auth.signInWithPopup(provider); 
+    } catch (e) { 
+        alert("登入失敗：" + e.message); 
+    }
+}
+
+function handleLogout() { 
+    if(confirm("確定要登出嗎？")) {
+        auth.signOut(); 
+        location.reload(); 
+    }
+}
+
+
 const API_BASE_URL = ""; 
 let currentImageUrl = ""; 
 
@@ -169,9 +250,11 @@ async function downloadAllInnerImages() {
 }
 
 // ==========================================
-// 🚀 發送首圖請求 (🌟 加入自動重試機制)
+// 🚀 發送首圖請求 
 // ==========================================
 async function startGeneration() {
+    if (!currentUser) return alert("系統保護中：請先使用 Google 帳號登入解鎖功能！"); // 🔒 權限保護
+
     const subjectFiles = document.getElementById('subjectInput').files;
     if (subjectFiles.length === 0 || !document.getElementById('title1').value) return alert("主體圖與主標題必填！");
 
@@ -260,6 +343,8 @@ async function startGeneration() {
                 document.getElementById('result-image').style.display = "block";
                 document.getElementById('downloadBtn').style.display = "block";
                 document.getElementById('generateBtn').disabled = false;
+                
+                // 🌟 將結果寫入雲端 Firestore
                 saveToHistory(currentImageUrl, document.getElementById('title1').value);
 
                 return;
@@ -279,9 +364,11 @@ async function startGeneration() {
 }
 
 // ==========================================
-// 🚀 發送內文圖請求 (🌟 加入各槽位獨立重試機制)
+// 🚀 發送內文圖請求 
 // ==========================================
 async function startGenerationInner() {
+    if (!currentUser) return alert("系統保護中：請先使用 Google 帳號登入解鎖功能！"); // 🔒 權限保護
+
     const files = document.getElementById('innerSubjectInput').files;
     if (files.length === 0) return alert("請至少上傳一張「產品主體圖」！");
     
@@ -331,7 +418,6 @@ async function startGenerationInner() {
             }
         };
 
-        // 獨立處理每一個版位的異步生成函數
         const runSlot = async (scenarioKey, index, p1Images) => {
             let promptBuilder = [];
             promptBuilder.push(`產品名稱：${productName}`);
@@ -356,7 +442,7 @@ async function startGenerationInner() {
             };
 
             const titleToSave = `${productName}_P${index+1}`;
-            const maxRetries = 2; // 每格最多允許退件重試 2 次
+            const maxRetries = 2; 
 
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 try {
@@ -372,22 +458,22 @@ async function startGenerationInner() {
                     
                     if (!data.task_id) throw new Error("無效任務ID");
                     
-                    // 等待生圖完成
                     const imageUrl = await pollStatusAsync(data.task_id, 'inner', index, titleToSave);
                     
-                    // 成功即展示並跳出迴圈
                     showInnerImage(index, imageUrl, titleToSave);
+                    // 🌟 寫入雲端歷史紀錄
                     saveToHistory(imageUrl, titleToSave);
+                    
                     checkAllCompleted();
                     return; 
 
                 } catch (err) {
                     if (attempt === maxRetries) {
                         updateSlotStatus(index, `❌ 最終生成失敗: 達到最大重試次數`);
-                        checkAllCompleted(); // 失敗也必須計入完成數量，避免按鈕卡死
+                        checkAllCompleted(); 
                         return;
                     }
-                    await new Promise(r => setTimeout(r, 3000)); // 失敗後停頓再出發
+                    await new Promise(r => setTimeout(r, 3000)); 
                 }
             }
         };
@@ -395,11 +481,7 @@ async function startGenerationInner() {
         for (let index = 0; index < scenariosToRun.length; index++) {
             const scenarioKey = scenariosToRun[index];
             const p1Images = (index === 0) ? [...p1RefB64, ...specImgB64] : [];
-            
-            // 將每個格子直接丟入背景異步執行
             runSlot(scenarioKey, index, p1Images);
-            
-            // 延遲 1.5 秒再丟下一個格子，避免瞬間併發量過大被伺服器阻擋
             await new Promise(resolve => setTimeout(resolve, 1500));
         }
 
@@ -414,9 +496,11 @@ async function startGenerationInner() {
 }
 
 // ==========================================
-// 🚀 發送文案與標題請求 (純文字生成較快，維持不變)
+// 🚀 發送文案請求
 // ==========================================
 async function startGenerationCopy() {
+    if (!currentUser) return alert("系統保護中：請先使用 Google 帳號登入解鎖功能！"); // 🔒 權限保護
+
     const files = document.getElementById('copyImageInput').files;
     const productName = document.getElementById('copyProductName').value;
     
@@ -471,7 +555,12 @@ async function startGenerationCopy() {
     }
 }
 
+// ==========================================
+// 🚀 發送標題請求
+// ==========================================
 async function startGenerationTitle() {
+    if (!currentUser) return alert("系統保護中：請先使用 Google 帳號登入解鎖功能！"); // 🔒 權限保護
+
     const keyword = document.getElementById('titleMainKeyword').value;
     if (!keyword) return alert("⚠️ 為了演算法生效，主關鍵字為必填！");
 
@@ -548,13 +637,12 @@ function pollStatusAsync(taskId, type, slotIndex = null, titleToSave = null) {
 
                 if (data.status === "completed") {
                     clearInterval(interval);
-                    resolve(data.image_url); // 成功抓到圖片，解除 Promise 封印
+                    resolve(data.image_url); 
                 } else if (data.status === "failed") {
                     clearInterval(interval);
-                    reject(new Error(data.detail || "AI退件")); // 失敗，直接丟給外層 catch 觸發重試
+                    reject(new Error(data.detail || "AI退件")); 
                 }
             } catch (error) { 
-                // 查詢過程網路不穩，不中斷，只顯示提示
                 if (type === 'inner') updateSlotStatus(slotIndex, `⏳ 網路連線等待中...`);
             }
         }, 8000);
@@ -582,34 +670,91 @@ function showInnerImage(index, imageUrl, title) {
 }
 
 // ==========================================
-// 💾 歷史紀錄管理
+// ☁️ 雲端歷史紀錄管理 (Firestore 整合)
 // ==========================================
-function saveToHistory(imageUrl, title) {
-    let history = JSON.parse(localStorage.getItem('saas_history') || '[]');
-    if (!history.find(item => item.url === imageUrl)) {
-        history.unshift({ url: imageUrl, title: title || '未命名圖片', time: new Date().toLocaleString('zh-TW', { hour12: false }) });
-        if(history.length > 50) history.pop();
-        localStorage.setItem('saas_history', JSON.stringify(history));
+async function saveToHistory(imageUrl, title) {
+    if (!currentUser) return; // 未登入不儲存
+    try {
+        await db.collection('saas_history').add({
+            uid: currentUser.uid, 
+            url: imageUrl, 
+            title: title || '未命名圖片', 
+            createdAt: firebase.firestore.FieldValue.serverTimestamp() // 記錄伺服器時間
+        });
+        
+        // 如果使用者正停留在歷史紀錄分頁，就即時更新畫面
+        if(document.getElementById('tab-history').style.display === 'block') {
+            renderHistory();
+        }
+    } catch (e) {
+        console.error("雲端紀錄儲存失敗：", e);
     }
 }
 
-function renderHistory() {
+async function renderHistory() {
     const grid = document.getElementById('history-grid');
-    let history = JSON.parse(localStorage.getItem('saas_history') || '[]');
-    if(history.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#999; padding: 50px;">目前還沒有任何生成紀錄喔！趕快去製作一張吧！</div>';
+    if (!currentUser) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#999; padding: 50px;">請先登入 Google 帳號以查看您的雲端戰績庫！</div>';
         return;
     }
-    grid.innerHTML = history.map(item => `
-        <div class="history-card">
-            <img src="${item.url}" class="history-img" onerror="this.src=''; this.alt='⚠️ 圖片已過期'; this.style.display='flex';">
-            <div class="history-title">${item.title}</div>
-            <div class="history-time">${item.time}</div>
-            <button class="history-dl-btn" onclick="downloadImageSafe('${item.url}', '${item.title}.jpg')">⬇️ 下載 / 查看</button>
-        </div>
-    `).join('');
+
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#7b61ff; padding: 50px;">⏳ 正在同步您的雲端資料庫...</div>';
+
+    try {
+        // 從資料庫抓取屬於該帳號的圖片 (依據時間排序)
+        const snapshot = await db.collection('saas_history')
+            .where('uid', '==', currentUser.uid)
+            .get();
+
+        if (snapshot.empty) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#999; padding: 50px;">您的雲端庫目前空空如也！趕快去製作一張首圖吧！</div>';
+            return;
+        }
+
+        // 依據建立時間進行排序 (新 -> 舊)
+        let historyData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        historyData.sort((a, b) => {
+            const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+            const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+            return timeB - timeA;
+        });
+
+        grid.innerHTML = historyData.map(item => {
+            const timeString = item.createdAt ? item.createdAt.toDate().toLocaleString('zh-TW', { hour12: false }) : '剛剛';
+            return `
+                <div class="history-card" id="history-card-${item.id}">
+                    <img src="${item.url}" class="history-img" onerror="this.src=''; this.alt='⚠️ 圖片已從伺服器移除'; this.style.display='flex';">
+                    <div class="history-title">${item.title}</div>
+                    <div class="history-time">${timeString}</div>
+                    <button class="history-dl-btn" onclick="downloadImageSafe('${item.url}', '${item.title}.jpg')">⬇️ 下載 / 查看</button>
+                </div>
+            `;
+        }).join('');
+
+    } catch (e) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:red; padding: 50px;">讀取失敗：${e.message}</div>`;
+    }
 }
 
-function clearHistory() {
-    if(confirm("確定清空紀錄？")) { localStorage.removeItem('saas_history'); renderHistory(); }
+async function clearHistory() {
+    if (!currentUser) return alert("請先登入！");
+    if(confirm("確定要清空您在雲端的所有紀錄嗎？(此動作無法復原)")) { 
+        try {
+            const snapshot = await db.collection('saas_history')
+                .where('uid', '==', currentUser.uid)
+                .get();
+            
+            // 批次刪除
+            const batch = db.batch();
+            snapshot.docs.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            
+            alert("雲端紀錄已清空！");
+            renderHistory();
+        } catch(e) {
+            alert("清空失敗：" + e.message);
+        }
+    }
 }

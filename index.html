@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>利安真自動化旗艦站 5.0</title>
+    <title>利安真自動化旗艦站 5.0 (會員版)</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -14,16 +18,32 @@
             <h1>利安真AI引擎</h1>
             <span>電商全自動旗艦版</span>
         </div>
+
+        <div id="auth-section" class="auth-section">
+            <button id="loginBtn" class="btn-google" onclick="handleGoogleLogin()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+                Google 帳號登入
+            </button>
+            <div id="userProfile" class="user-profile" style="display: none;">
+                <img id="userPhoto" src="" alt="avatar">
+                <div class="user-info">
+                    <span id="userName">載入中...</span>
+                    <span id="userEmail" style="font-size: 0.7rem; color: #a0a0b5;"></span>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">登出</button>
+            </div>
+        </div>
+
         <ul class="nav-menu">
             <li class="nav-item active" onclick="switchTab('tab-hero', this)">🖼️ 大師級首圖</li>
             <li class="nav-item" onclick="switchTab('tab-inner', this)">📄 全套詳情圖</li>
             <li class="nav-item" onclick="switchTab('tab-copy', this)">✍️ 爆款文案生成</li>
             <li class="nav-item" onclick="switchTab('tab-title', this)">💡 點擊率標題</li>
-            <li class="nav-item history-tab" onclick="switchTab('tab-history', this)" style="border-top: 1px solid #333; margin-top: 10px;">🕒 歷史生成紀錄</li>
+            <li class="nav-item history-tab" onclick="switchTab('tab-history', this)" style="border-top: 1px solid #333; margin-top: 10px;">🕒 雲端生成紀錄</li>
         </ul>
     </div>
 
-    <div class="main-wrapper">
+    <div id="main-wrapper" class="main-wrapper" style="opacity: 0.3; pointer-events: none; transition: 0.3s;">
         
         <div id="tab-hero" class="tab-content active">
             <div class="panel left-panel">
@@ -379,8 +399,9 @@
 
         <div id="tab-history" class="tab-content">
             <div class="panel" style="width: 100%;">
-                <button class="clear-btn" onclick="clearHistory()">🗑️ 清空紀錄</button>
-                <h2 style="border:none; padding:0; margin-bottom: 5px;">🕒 我的生成戰績 (LocalStorage)</h2>
+                <button class="clear-btn" onclick="clearHistory()">🗑️ 清空我的雲端紀錄</button>
+                <h2 style="border:none; padding:0; margin-bottom: 5px;">🕒 我的雲端戰績庫</h2>
+                <div class="hint">這些資料已安全綁定您的 Google 帳號，跨裝置也可隨時取用。</div>
                 <div id="history-grid" class="history-grid"></div>
             </div>
         </div>

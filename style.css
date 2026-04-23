@@ -4,6 +4,19 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:
 .logo-area { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #333; margin-bottom: 10px; }
 .logo-area h1 { margin: 0; font-size: 1.5rem; color: #fff; letter-spacing: 1px; }
 .logo-area span { font-size: 0.8rem; color: #7b61ff; font-weight: bold; }
+
+/* 🌟 會員登入區塊設計 */
+.auth-section { padding: 0 20px 20px 20px; border-bottom: 1px solid #333; margin-bottom: 10px; }
+.btn-google { width: 100%; padding: 10px; background: #fff; color: #333; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.btn-google:hover { background: #f0f0f0; transform: translateY(-1px); }
+.btn-google img { width: 18px; }
+.user-profile { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #2a2a40; padding: 10px; border-radius: 8px; }
+.user-profile img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #7b61ff; object-fit: cover; }
+.user-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.user-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; font-size: 0.9rem; font-weight: bold; }
+.btn-logout { width: 100%; padding: 6px; background: transparent; color: #ef4444; border: 1px solid #ef4444; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: 8px; transition: 0.2s; }
+.btn-logout:hover { background: #ef4444; color: white; }
+
 .nav-menu { list-style: none; padding: 0; margin: 0; }
 .nav-item { padding: 16px 25px; cursor: pointer; transition: 0.2s; color: #a0a0b5; font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
 .nav-item:hover { background: #2a2a40; color: #fff; }
@@ -79,6 +92,7 @@ details.prompt-suggestions summary::-webkit-details-marker { display: none; }
     .sidebar { width: 100%; padding-top: 10px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     .logo-area { display: flex; justify-content: center; align-items: center; gap: 15px; padding-bottom: 10px; margin-bottom: 0; border-bottom: 1px solid #333; }
     .logo-area h1 { font-size: 1.3rem; }
+    .auth-section { padding: 10px; border-bottom: none; }
     .nav-menu { display: flex; flex-direction: row; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .nav-menu::-webkit-scrollbar { display: none; }
     .nav-item { padding: 12px 15px; font-size: 0.95rem; border-right: none; border-bottom: 3px solid transparent; }
