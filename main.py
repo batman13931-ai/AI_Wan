@@ -69,7 +69,7 @@ class TitleGenerateRequest(BaseModel):
     category_words: str
 
 # ==========================================
-# 🧠 大腦 1：首圖專屬通道 (已升級 GPT-Image-2)
+# 🧠 大腦 1：首圖專屬通道 (GPT-Image-2 修復版)
 # ==========================================
 @app.post("/api/generate/hero")
 async def generate_hero(req: HeroGenerateRequest):
@@ -159,13 +159,11 @@ async def generate_hero(req: HeroGenerateRequest):
 {f'自訂要求：{req.custom_prompt}' if req.custom_prompt else ''}
 """
 
-    # 🌟 已更新為 GPT-Image-2 專用模型名稱
+    # 🌟 修復重點：移除了 GPT-Image-2 不支援的 aspect_ratio 與 ratio 參數
     payload = {
         "model": "openai/gpt-image-2",
         "prompt": system_prompt,
-        "images": all_images,
-        "aspect_ratio": "1:1",
-        "ratio": "1:1"
+        "images": all_images
     }
 
     headers = {
@@ -187,7 +185,7 @@ async def generate_hero(req: HeroGenerateRequest):
 
 
 # ==========================================
-# 🧠 大腦 2：內文圖專屬通道 (已升級 GPT-Image-2)
+# 🧠 大腦 2：內文圖專屬通道 (GPT-Image-2 修復版)
 # ==========================================
 @app.post("/api/generate/inner")
 async def generate_inner(req: InnerGenerateRequest):
@@ -225,13 +223,11 @@ async def generate_inner(req: InnerGenerateRequest):
 {req.custom_prompt}
 """
 
-    # 🌟 已更新為 GPT-Image-2 專用模型名稱
+    # 🌟 修復重點：移除了 GPT-Image-2 不支援的 aspect_ratio 與 ratio 參數
     payload = {
         "model": "openai/gpt-image-2",
         "prompt": system_prompt,
-        "images": all_images,
-        "aspect_ratio": "1:1",
-        "ratio": "1:1"
+        "images": all_images
     }
     
     headers = { "Accept": "application/json", "Content-Type": "application/json", "Authorization": f"Bearer {API_KEY}" }
